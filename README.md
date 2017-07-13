@@ -16,7 +16,7 @@ make
 Cleanup the project with,
 
 ~~~~~~
-`make clean`.
+make clean
 ~~~~~~
 
 
