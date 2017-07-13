@@ -1,19 +1,19 @@
 Tragaperras
 ===========
 
-Build an executable with the following `go` command,
+Build an executable with the following `go` command.
 
 ~~~~~~
 go build src/juego.go
 ~~~~~~
 
-or use the Makefile,
+Or use the Makefile to compile.
 
 ~~~~~~
 make
 ~~~~~~
 
-Cleanup the project with,
+Make can also be used to the built project files.
 
 ~~~~~~
 make clean
