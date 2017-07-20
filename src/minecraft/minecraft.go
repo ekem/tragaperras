@@ -1,11 +1,11 @@
 package minecraft
 
 import (
-	. "../trasto"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"os"
+	. "trasto"
 )
 
 type Latest struct {
