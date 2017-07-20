@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	. "trasto"
 )
 
 //var Instance = Authenticator{}
@@ -99,6 +100,7 @@ func Authenticate(
 		os.Exit(-1)
 	}
 
+	// Create a new POST request.
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/authenticate", url), bytes.NewBuffer(b))
 
 	req.Header.Set("X-Custom-Header", "lapis")
@@ -142,6 +144,8 @@ func Authenticate(
 
 		return res.ID, nil
 	*/
+
+	return "", nil
 }
 
 func twosCompliment(p []byte) {
