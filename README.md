@@ -1,6 +1,16 @@
 Tragaperras
 ===========
 
+Ensure the environment variable `GOPATH` is set.
+
+~~~~~~shell
+# Windows
+echo $Env:GOPATH
+
+# GNU/Linux
+echo $GOPATH
+~~~~~~
+
 Build an executable with the following `go` command.
 
 ~~~~~~
