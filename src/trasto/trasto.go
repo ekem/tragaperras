@@ -7,13 +7,19 @@ import (
 	"os"
 )
 
-func Check(e error) {
-	if e != nil {
-		log.Fatal(e)
+var (
+	Debug bool
+)
+
+func Check(err error) error {
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	return err
 }
 
-func Make_a_file(filename string) *os.File {
+func MakeFile(filename string) *os.File {
 	// Create a file on the host file system.
 	outfile, err := os.Create(filename)
 
@@ -22,22 +28,28 @@ func Make_a_file(filename string) *os.File {
 	return outfile
 }
 
-func Get_a_file(filename string, url string) {
-	log.Printf("Downloading %s.", url)
+func DownloadFile(filename string, url string) {
 	outfile, err := os.Create(filename)
 	Check(err)
 	defer outfile.Close()
 
-	response := Make_a_request(url)
+	if Debug {
+		log.Printf("Downloading %s.", url)
+	}
+
+	response := MakeRequest(url)
 
 	defer response.Body.Close()
+
 	n, err := io.Copy(outfile, response.Body)
 	Check(err)
 
-	log.Printf("%d bytes written to disk at %s.", n, filename)
+	if Debug {
+		log.Printf("%d bytes written to disk at %s.", n, filename)
+	}
 }
 
-func Make_a_request(uri string) (r *http.Response) {
+func MakeRequest(uri string) (r *http.Response) {
 	r, err := http.Get(uri)
 	Check(err)
 	return

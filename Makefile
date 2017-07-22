@@ -2,9 +2,11 @@ BINARY = juego
 
 ifeq ($(OS),Windows_NT)
 	APPEND = .exe
+	GOPATH = $(shell cygpath -w $(shell pwd))
 endif
 
-all: jugar juego
+all: juego
+	@(export GOPATH="$(GOPATH)")
 
 jugar:
 	go build -o bin/$@$(APPEND) src/$@.go
@@ -13,6 +15,5 @@ juego:
 
 clean:
 	@(if [ -d bin/ ] ; then rm -r bin/* bin/ ; fi)
-	@(if [ -f nativelog.txt ] ; then rm nativelog.txt ; fi)
 
 PHONY: clean all

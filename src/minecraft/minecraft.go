@@ -2,10 +2,16 @@ package minecraft
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	. "trasto"
+)
+
+const (
+	SERVER = iota
+	CLIENT
 )
 
 type Latest struct {
@@ -43,8 +49,8 @@ type Download struct {
 	URL  string `json:"url"`
 }
 
-func LatestVersion() (l Latest) {
-	versions := Find_versions()
+func GetLatestVersion() (l Latest) {
+	versions := GetVersionFile()
 
 	var r Record
 	err := json.Unmarshal(versions, &r)
@@ -54,14 +60,29 @@ func LatestVersion() (l Latest) {
 	return
 }
 
-func Find_versions() (versions []byte) {
+func GetPackage(p int) string {
+	switch p {
+	case SERVER:
+		return "server"
+	case CLIENT:
+		return "client"
+	}
+
+	return ""
+}
+
+func GetVersionFile() []byte {
+	return findVersionFile()
+}
+
+func findVersionFile() (versions []byte) {
 	filename := "./tmp/version_manifest.json"
 	url := "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		log.Print("Minecraft version manifest not found.")
 
-		Get_a_file(filename, url)
+		DownloadFile(filename, url)
 	}
 
 	versions, err := ioutil.ReadFile(filename)
@@ -71,27 +92,61 @@ func Find_versions() (versions []byte) {
 	return versions
 }
 
-func Get_a_version(id string, opt int) {
-	versions := Find_versions()
+func GetArguments(version string) (arguments string) {
+	versions := GetVersionFile()
 
 	var r Record
 	err := json.Unmarshal(versions, &r)
 	Check(err)
 
-	var jugar Jugar
-	response := Make_a_request(r.Versions[0].URL)
+	response := MakeRequest(r.Versions[0].URL)
 	buf, err := ioutil.ReadAll(response.Body)
-	log.Printf("%s", buf)
-	err = json.Unmarshal(buf, &jugar)
+
+	var j Jugar
+	err = json.Unmarshal(buf, &j)
 	Check(err)
 
-	log.Print(jugar.MinecraftArguments)
+	arguments = j.MinecraftArguments
+
+	return
+}
+
+func GetJugar(id string) (j Jugar) {
+	versions := GetVersionFile()
+
+	var r Record
+	err := json.Unmarshal(versions, &r)
+	Check(err)
+
+	response := MakeRequest(r.Versions[0].URL)
+	buf, err := ioutil.ReadAll(response.Body)
+
+	if Debug {
+		log.Printf(string(buf))
+	}
+
+	err = json.Unmarshal(buf, &j)
+	Check(err)
+
+	return
+}
+
+func DownloadVersion(id string, location string, opt int) {
+	var jugar Jugar
+
+	jugar = GetJugar(id)
+
+	var packageType string
 
 	switch opt {
-	case 1:
-		Get_a_file("./tmp/server.jar", jugar.Downloads.Server.URL)
-		fallthrough
-	default:
-		Get_a_file("./tmp/client.jar", jugar.Downloads.Client.URL)
+	case CLIENT:
+		packageType = "client"
+	case SERVER:
+		packageType = "server"
 	}
+
+	DownloadFile(
+		fmt.Sprintf("%s/%s.jar", location, packageType),
+		jugar.Downloads.Server.URL,
+	)
 }
